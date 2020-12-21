@@ -47,9 +47,28 @@ export default {
 
     async getMatchHistory(summonerID)
     {
+        if(summonerID == undefined)
+            console.log("Poop");
         const matchHistory_response = await fetch('/api/matchHistory/' + summonerID,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
         const matchHistory_data = await matchHistory_response.json();
         return matchHistory_data;
+    },
+
+    async getTeamRankedInfoByID(players)
+    {
+        let r = players.map(async function(player) {
+            const account_response = await fetch('/api/summoner/'+ player.summonerName,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
+            const account_data = await account_response.json();
+            let playerId = account_data.id;
+
+            const ranked_response = await fetch('/api/ranked/'+ playerId,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
+            const ranked_data = await  ranked_response.json();
+            return ranked_data;
+        });
+
+        r = await Promise.all(r);
+
+        return r;
     }
 
 }

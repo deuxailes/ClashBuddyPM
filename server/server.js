@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const fetch = require('node-fetch');
-const APIKEY = 'RGAPI-68b53cdf-6cf4-4c11-98d7-5c13ba06d13c';
+const APIKEY = 'RGAPI-bb63dd41-c50d-4e3b-a97b-f2239d9408a0';
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const port = 3000;
@@ -79,4 +79,3 @@ app.get('/api/matchHistory/:id',async (request,response) =>{ // Sends back 75 ma
 })
 
 app.listen(port, () => console.log('listenting at 3000'));
-

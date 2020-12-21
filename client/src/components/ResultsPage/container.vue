@@ -55,26 +55,16 @@ export default {
         let redTeam = gameParticpants.slice(0,5);
         let blueTeam = gameParticpants.slice(5,10);
 
-        let start = new Date().getTime();
-        let r = await roleFinder.championRoles(redTeam);
-        console.log("time r: ");
-        console.log(new Date().getTime() - start);  
+        let stats = await leagueAPI.getTeamRankedInfoByID(redTeam);
+        console.log(stats);
+
+        //let redTeamRoles = await roleFinder.championRoles(redTeam);
+        //let b = await roleFinder.championRoles(blueTeam);
 
 
 
-        let start1 = new Date().getTime();
-        let b = await roleFinder.championRoles(blueTeam);
-        console.log("time b: ");
-        console.log(new Date().getTime() - start1);  
-
-
-
-
-        
-        console.log("total time: ");
-        console.log(new Date().getTime() - start);  
-        this.redTeam = r;
-        this.blueTeam = b;
+        //this.redTeam = r;
+        //this.blueTeam = b;
   
         
          

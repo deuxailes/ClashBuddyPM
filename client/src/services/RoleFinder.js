@@ -77,18 +77,6 @@ async function getRolesWithJungler(champions,jgler,team)
 
     
     let playersHistory = await Promise.all(mhd);
-    
-
-    /*for(let player of team)
-    {
-        let playerAccountID = await leagueAPI.getAccount(player.summonerName);  
-        let matchHistoryData = await leagueAPI.getMatchHistory(playerAccountID.accountId);
-
-        if(player.championId != jgler)
-            playersHistory.push(matchHistoryData);
-    }  */
-
-
     let laneRates = await analyze(playersHistory,champions);
 
     for(let j = laneRates.length-1; j >= 0; j--)                        //FINDS SUPPORT FIRST THEN ---> ADC ----> MIDDLE ----> TOP
@@ -121,18 +109,18 @@ async function getRolesWithJungler(champions,jgler,team)
             }   
         }
 
-       /* console.log("FIRST LANE: " + highestLaneRate);
+        console.log("FIRST LANE: " + highestLaneRate);
         console.log("SECOND LANE: " + secondHighestLaneRate);
         console.log("THIRD LANE: " + thirdHighestLaneRate);
-        console.log("--------------------");*/
+        console.log("--------------------");
 
         let diff  = highestLaneRate - secondHighestLaneRate;
         let diff2 = secondHighestLaneRate - thirdHighestLaneRate;
 
 
-        if(diff > .5)
+        if(diff < .5 || diff == Number.POSITIVE_INFINITY)
         {
-            if(diff2 > .15 && diff2 != Number.POSITIVE_INFINITY)
+            if(diff2 < .15 && diff2 != Number.POSITIVE_INFINITY)
             {
                 if(champIndex[0] >= 0 && champIndex[1] >= 0 && champIndex[2] >= 0 )
                 {
@@ -148,17 +136,14 @@ async function getRolesWithJungler(champions,jgler,team)
                     let max = Math.max(playRate1,playRate2,playRate3);
                     
                     if(max == playRate1)
-                    {
-     
-                                
-                        let summoner = team.find(player => player.championId == champions[champIndex[0]]);
-                        
+                    {                            
+                        let summoner = team.find(player => player.championId == champions[champIndex[0]]);                        
                         let d = {'Player': summoner.summonerName,'champion': await champFinder.getChampionByKey(champions[champIndex[0]])};
 
                         identifed.push(d);
                         laneRates.splice(champIndex[0],1);
                         champions.splice(champIndex[0],1);
-                        //console.log(laneRates);
+                        console.log(laneRates);
                     }
                     else if(max == playRate2){
                         let summoner = team.find(player => player.championId == champions[champIndex[1]]);
@@ -167,7 +152,7 @@ async function getRolesWithJungler(champions,jgler,team)
                         identifed.push(d);
                         laneRates.splice(champIndex[1],1);
                         champions.splice(champIndex[1],1);
-                        //console.log(laneRates);
+                        console.log(laneRates);
                     }
                     else if(max == playRate3)
                     {
@@ -177,7 +162,7 @@ async function getRolesWithJungler(champions,jgler,team)
                         identifed.push(d);
                         laneRates.splice(champIndex[2],1);
                         champions.splice(champIndex[2],1);
-                        //console.log(laneRates);
+                        console.log(laneRates);
                     }
                 }
             }
@@ -189,7 +174,7 @@ async function getRolesWithJungler(champions,jgler,team)
                 identifed.push(d);
                 laneRates.splice(champIndex[0],1);
                 champions.splice(champIndex[0],1);
-                //console.log(laneRates);
+                console.log(laneRates);
             }
         }
         else
@@ -211,7 +196,7 @@ async function getRolesWithJungler(champions,jgler,team)
                     identifed.push(d);
                     laneRates.splice(champIndex[0],1);
                     champions.splice(champIndex[0],1);
-                    //console.log(laneRates);
+                    console.log(laneRates);
                 }
                 else{
                     let summoner = team.find(player => player.championId == champions[champIndex[1]]);
@@ -220,7 +205,7 @@ async function getRolesWithJungler(champions,jgler,team)
                     identifed.push(d);
                     laneRates.splice(champIndex[1],1);
                     champions.splice(champIndex[1],1);
-                    //console.log(laneRates);
+                    console.log(laneRates);
                 }
 
             }
@@ -286,8 +271,8 @@ async function analyze(playerHistory,champions)
         
         laneRates = laneCnt.map(x => (x/numGames));	
         playersLaneRates.push(laneRates);
-        //console.log(laneRates);
-        //console.log(await champFinder.getChampionByKey(champions[i]) + ": " + championCnt);
+        console.log(laneRates);
+        console.log(await champFinder.getChampionByKey(champions[i]) + ": " + championCnt);
         
         
 
