@@ -1,28 +1,10 @@
 const express = require('express');
 const app = express();
 const fetch = require('node-fetch');
-const APIKEY = 'RGAPI-bb63dd41-c50d-4e3b-a97b-f2239d9408a0';
+const APIKEY = 'RGAPI-eab763fd-6716-438c-ae6f-f6c363e3fb23';
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const port = 3000;
-const mysql = require('mysql');
-
-const con = mysql.createConnection({
-    host: "database-1.c5sr4ubnohcj.us-east-1.rds.amazonaws.com",
-    port: "3306",
-    user: "admin",
-    password: "4419tina"
-});
-
-con.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected to DB!");
-    con.query('CREATE DATABASE IF NOT EXISTS main;');
-    con.query('USE main;');
-    con.query('CREATE TABLE IF NOT EXISTS summoners (id varchar(47), accountId varchar(47), profileiconid int, summonername varchar(16), summonerlevel int, winrate float, sumRank varchar(255), lastChecked int);', function(error, result, fields) {
-        if (err) throw error;
-    });
-});
 
 var AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
@@ -41,30 +23,13 @@ app.get('/', (req, res) => {
 app.get('/api/summoner/:name', async (request, response) => { // Returns ID and account info to client
 
     let name = request.params.name;
-    
-    con.query('SELECT * FROM summoners WHERE summonername = \'' + name + '\';', async function(error, result, fields) {
-        console.log(result);
-        if (result.length == 0) {
-            const fetch_response = await fetch('https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/'+ encodeURIComponent(name) + '?api_key=' + APIKEY);
-            const data = await fetch_response.json();
-            console.log(data);
-            response.send(data);
-        } else {
-            console.log("Returning " + name + " to client from RIOT");
-            var obj = new Object();
-            obj.id = result[0].id;
-            obj.profileIconId  = result[0].profileiconid;
-            obj.name = name;
-            obj.accountId = result[0].accountId; 
-            var jsonString= JSON.stringify(obj);
-            response.send(jsonString);
-        }
-    });
+    const fetch_response = await fetch('https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/'+ encodeURIComponent(name) + '?api_key=' + APIKEY);
+    const data = await fetch_response.json();
+    response.send(data);
 
 })
 
 app.get('/api/ranked/:id',async (request, response) => { // Returns info about requested summoner to client
-    console.log("im here")
     const id = request.params.id;
     var playerValue = {isHot: false,isVeteran: false, isInactive: false,totalMastery: 0,winRate: 0.0,currentRank: "Iron IV"};
     
@@ -73,12 +38,6 @@ app.get('/api/ranked/:id',async (request, response) => { // Returns info about r
     const mastery_response = await fetch('https://na1.api.riotgames.com/lol/champion-mastery/v4/scores/by-summoner/'+ id + '?api_key=' + APIKEY);
     const mastery_data = await mastery_response.json();
 
-    console.log(ranked_data);
-    let wins = parseInt(ranked_data[0].wins);
-    let losses = parseInt(ranked_data[0].losses);
-
-
-    
     if(ranked_data){
         let wins = parseInt(ranked_data[0].wins);
         let losses = parseInt(ranked_data[0].losses);
@@ -110,16 +69,13 @@ app.get('/api/currentGame/:id',async (request,response) => { // Returns currentG
 })
 
 app.get('/api/matchHistory/:id',async (request,response) =>{ // Sends back 75 matches to client
-
+    let start = new Date().getTime();
     const id = request.params.id;
     const matchHistory_response = await fetch('https://na1.api.riotgames.com/lol/match/v4/matchlists/by-account/'+ id +'?beginTime='+ Math.floor(new Date().getTime()/1000.0) + '&endIndex=75&beginIndex=0&api_key='+ APIKEY);   
     const matchHistory_data = await matchHistory_response.json();
-    
-    if(id == undefined)
-        console.log("poop fart");
-
+    console.log("time2: ");
+    console.log(new Date().getTime() - start);
     response.send(matchHistory_data);
 })
 
 app.listen(port, () => console.log('listenting at 3000'));
-

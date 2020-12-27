@@ -1,11 +1,12 @@
 export default {
 
 
-    async getAccount(summonerName)
+    async getAccount(summonerName) // Calls Riot API one time.
     {
-        if(summonerName){
+        if(summonerName){ 
             const account_response = await fetch('/api/summoner/'+ summonerName,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
             const account_data = await account_response.json();
+            
             return account_data;
         }
         else 
@@ -13,11 +14,12 @@ export default {
     },
 
 
-    async getRankedInfoByID(summonerID)
+    async getRankedInfoByID(summonerID) // Calls Riot API two times.
     {
         if(summonerID){
             const ranked_response = await fetch('/api/ranked/'+ summonerID,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
             const ranked_data = await  ranked_response.json();
+            console.log("api called");
             return ranked_data;
         }
         else 
@@ -31,6 +33,7 @@ export default {
         if(summonerID){
             const spectator_response = await fetch('/api/currentGame/'+ summonerID,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
             const spectator_data = await spectator_response.json();
+            console.log("api called");
             return spectator_data;
         }
         else
@@ -51,23 +54,24 @@ export default {
             console.log("Poop");
         const matchHistory_response = await fetch('/api/matchHistory/' + summonerID,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
         const matchHistory_data = await matchHistory_response.json();
+        console.log("api called");
         return matchHistory_data;
     },
 
     async getTeamRankedInfoByID(players)
     {
         let r = players.map(async function(player) {
-            const account_response = await fetch('/api/summoner/'+ player.summonerName,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
+            const account_response = await fetch('/api/summoner/'+ player.player,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
             const account_data = await account_response.json();
             let playerId = account_data.id;
 
             const ranked_response = await fetch('/api/ranked/'+ playerId,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
             const ranked_data = await  ranked_response.json();
+            console.log(ranked_data);
             return ranked_data;
         });
 
         r = await Promise.all(r);
-
         return r;
     }
 

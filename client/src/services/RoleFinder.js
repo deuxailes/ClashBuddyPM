@@ -71,6 +71,7 @@ async function getRolesWithJungler(champions,jgler,team)
     
     let mhd = team.map(async function(player) {
             let playerAccountID = await leagueAPI.getAccount(player.summonerName);  
+            
             let matchHistoryData = leagueAPI.getMatchHistory(playerAccountID.accountId);
             return matchHistoryData;
     });
@@ -271,7 +272,7 @@ async function analyze(playerHistory,champions)
         
         laneRates = laneCnt.map(x => (x/numGames));	
         playersLaneRates.push(laneRates);
-        console.log(laneRates);
+        console.table(laneRates);
         console.log(await champFinder.getChampionByKey(champions[i]) + ": " + championCnt);
         
         
