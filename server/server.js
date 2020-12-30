@@ -2,7 +2,7 @@
 const express = require('express');
 const app = express();
 const fetch = require('node-fetch');
-const APIKEY = 'RGAPI-19412ff9-cf51-4161-b801-ac3d04a68249';
+const APIKEY = 'RGAPI-e469bcc6-22d5-485e-9574-2f7f6a8415ad';
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const port = 3000;
@@ -38,7 +38,8 @@ con.connect(function(err) {
     });
 });
 
-app.get('/api/summoner/:name', async (request, response) => { // Returns ID and account info to client
+
+app.get('/api/summoner/:name', async (request, response) => { // Checks if accounnt info is already in DB and then returns ID and account info to client
 
     let name = request.params.name;
     // preparedStatement = prepare('SELECT * FROM summoners WHERE summonername = ?');
@@ -48,7 +49,7 @@ app.get('/api/summoner/:name', async (request, response) => { // Returns ID and 
         if(result.length === 0){
             const fetch_response = await fetch('https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/'+ encodeURIComponent(name) + '?api_key=' + APIKEY);
             const data = await fetch_response.json();
-            console.log("account api called");
+            console.log("account api called",data);
             response.send(data);
             
         }
@@ -58,8 +59,8 @@ app.get('/api/summoner/:name', async (request, response) => { // Returns ID and 
             obj.profileIconId  = result[0].profileiconid;
             obj.id = result[0].id;
             obj.accountId = result[0].accountid;
-            obj.summonerLevel = result[0].summonerLevel;
-            console.log("database called");
+            obj.summonerLevel = result[0].summonerlevel;
+            console.log("database called",obj);
             response.send(JSON.stringify(obj));
         }
     });
@@ -78,7 +79,7 @@ app.get('/api/summoner/:name', async (request, response) => { // Returns ID and 
 
 })
 
-app.post('/api/summoner/', async(request, response) =>{
+app.post('/api/summoner/', async(request, response) =>{ //post user to DB if its not already in
     request.setTimeout(0);
     let summoner = request.body;
     let conStr = "SELECT * FROM summoners WHERE id = \'" + summoner.id + "\';";
@@ -93,17 +94,16 @@ app.post('/api/summoner/', async(request, response) =>{
                 return data.json();
             }).then( async function(ranked_data) {
                
-                const fetch_response = await fetch('https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/'+ encodeURIComponent(summoner.name) + '?api_key=' + APIKEY).then( data => {
-                    return data.json();
-                }).then( function(basic_data) {
+                
                     
                     
-                    console.log("ranked and account api called");
-                    let entries = [ basic_data.id, 
-                                    basic_data.accountId, 
-                                    basic_data.profileIconId, 
-                                    basic_data.name, 
-                                    basic_data.summonerLevel, 
+                    console.log("ranked and account api called",summoner);
+
+                    let entries = [ summoner.id, 
+                                    summoner.accountId, 
+                                    summoner.profileIconId, 
+                                    summoner.name, 
+                                    summoner.summonerLevel, 
                                     0,
                                     0, 
                                     0,
@@ -111,11 +111,11 @@ app.post('/api/summoner/', async(request, response) =>{
                                     Math.floor(new Date().getTime()/1000.0)];
 
                     if(ranked_data.length > 0) {
-                        entries = [ basic_data.id, 
-                                    basic_data.accountId, 
-                                    basic_data.profileIconId, 
-                                    basic_data.name, 
-                                    basic_data.summonerLevel, 
+                        entries = [ summoner.id, 
+                                    summoner.accountId, 
+                                    summoner.profileIconId, 
+                                    summoner.name, 
+                                    summoner.summonerLevel, 
                                     ranked_data[0].wins,
                                     ranked_data[0].losses, 
                                     ((ranked_data[0].wins/(ranked_data[0].wins+ranked_data[0].losses))).toFixed(3),
@@ -123,15 +123,13 @@ app.post('/api/summoner/', async(request, response) =>{
                                     Math.floor(new Date().getTime()/1000.0)];
                     }
 
-                    if(!basic_data)
-                        console.log("hey",summoner,basic_data)
                         
                     con.query('INSERT INTO summoners (id, accountid, profileiconid, summonername, summonerlevel, wins, losses, winrate, sumRank, lastChecked) VALUES(?,?,?,?,?,?,?,?,?,?);', entries);
                     
 
 
                     
-                });
+                
                 
             });
         }
@@ -146,7 +144,7 @@ app.post('/api/summoner/', async(request, response) =>{
     response.status(200).send("HEY");   
 })
 
-app.get('/api/ranked/:id',async (request, response) => { // Returns info about requested summoner to client
+app.get('/api/ranked/:id',async (request, response) => { // Returns ranked and player value info about requested summoner to client
     const id = request.params.id;
 
     var playerValue = {isHot: false,isVeteran: false, isInactive: false,totalMastery: 0,winRate: 0.0,currentRank: "Unranked"};
@@ -192,7 +190,7 @@ app.get('/api/currentGame/:id',async (request,response) => { // Returns currentG
 app.get('/api/matchHistory/:id',async (request,response) =>{ // Sends back 75 matches to client
     let start = new Date().getTime();
     const id = request.params.id;
-    const matchHistory_response = await fetch('https://na1.api.riotgames.com/lol/match/v4/matchlists/by-account/'+ id +'?beginTime='+ Math.floor(new Date().getTime()/1000.0) + '&endIndex=75&beginIndex=0&api_key='+ APIKEY);   
+    const matchHistory_response = await fetch('https://na1.api.riotgames.com/lol/match/v4/matchlists/by-account/'+ id +'?beginTime='+ Math.floor(new Date().getTime()/1000.0) + '&endIndex=15&beginIndex=0&api_key='+ APIKEY);   
     const matchHistory_data = await matchHistory_response.json();
     //console.log("time2: ");
     //console.log(new Date().getTime() - start);
