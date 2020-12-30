@@ -19,7 +19,7 @@ export default {
                 championByIdCache[language][champInfo.key] = champInfo;
             }
         }
-        //console.log(championByIdCache);
+        // console.log(championByIdCache[language][key]['image'].full);
         return championByIdCache[language][key].name;
     },
     async getChampionByName(name, language = "en_US") 
@@ -40,6 +40,25 @@ export default {
         }
        
         return championByNameCache[language][name].key;
+    },
+    async getChampionImageName(name, language = "en_US") 
+    {
+        if (!championByNameCache[language]) {
+            let json = await getLatestChampionDDragon(language);
+
+            championByNameCache[language] = {};
+            
+            for (var championName in json.data) {
+                if (!json.data.hasOwnProperty(championName))
+                    continue;
+
+                const champInfo = json.data[championName];
+                
+                championByNameCache[language][champInfo.name] = champInfo;
+            }
+        }
+        
+        return championByNameCache[language][name]['image'].full.slice(0,-4);
     }
 }
 

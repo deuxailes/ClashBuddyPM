@@ -23,7 +23,7 @@
             size="120"
             color="grey"
           >
-            <v-img :src="require('@/assets/champion/' + champName + '.png')"></v-img>
+            <v-img :src="require('@/assets/champion/' + img + '.png')"></v-img>
             
           </v-list-item-avatar>
         </v-list-item>
@@ -44,7 +44,7 @@ import leagueAPI from "@/services/LeagueAPICaller.js"
 
 export default {
   data: () => ({
-
+    img: ''
     
     }),
   computed: {
@@ -58,13 +58,17 @@ export default {
     }
   },
 
-    props:['summonerName','currentRank','winRate','champion']
+  props:['summonerName','currentRank','winRate','champion'],
+
+  created: async function(){
+    let call = champFinder.getChampionImageName(this.champion).then(data =>{
+      this.img = data;
+    });
+  }
 
     // mounted: async function(){
     //   let player = await leagueAPI.getAccount(this.summonerName).then(async(data) =>{
-    //     console.log(data);
     //     const postToDB = fetch('/api/summoner',{ method: 'POST', headers: {'Content-Type' : 'application/json' }, body: JSON.stringify(data)});
-        
     //   });
       
     // }

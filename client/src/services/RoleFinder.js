@@ -46,7 +46,7 @@ export default {
             champions.splice(i,1);
             let np = players.filter(player => player.championId != jgler);
             let name = players.find(player => player.championId == jgler).summonerName;
-            jgler = {'Player' : name, 'champion': jgler}
+            jgler = {'Player' : name, 'champion': jgler};
             guessedRoles = getRolesWithJungler(champions,jgler,np);
 
         } 
@@ -67,7 +67,7 @@ async function getRolesWithJungler(champions,jgler,team)
     
     let identifed = [];
     
-    let start = new Date().getTime();
+    
     
     let mhd = team.map(async function(player) {
             let playerAccountID = await leagueAPI.getAccount(player.summonerName);  
@@ -218,8 +218,7 @@ async function getRolesWithJungler(champions,jgler,team)
     identifed.splice(1,0,{'Player': jgler.Player, 'champion': await champFinder.getChampionByKey(jgler.champion)});
 
 
-    console.log("time1: ");
-    console.log(new Date().getTime() - start);
+
     return identifed;
 }
 

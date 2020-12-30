@@ -61,13 +61,12 @@ export default {
     async getTeamRankedInfoByID(players)
     {
         let r = players.map(async function(player) {
-            const account_response = await fetch('/api/summoner/'+ player.player,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
+            const account_response = await fetch('/api/summoner/'+ player.Player,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
             const account_data = await account_response.json();
             let playerId = account_data.id;
 
             const ranked_response = await fetch('/api/ranked/'+ playerId,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
             const ranked_data = await  ranked_response.json();
-            console.log(ranked_data);
             return ranked_data;
         });
 
