@@ -37,7 +37,7 @@ export default {
             return spectator_data;
         }
         else
-            throw new Error("Null String")
+            throw new Error("Null String");
     },
 
     async pull_champion_rates()
@@ -50,12 +50,14 @@ export default {
 
     async getMatchHistory(summonerID)
     {
-        if(summonerID == undefined)
-            console.log("Poop");
-        const matchHistory_response = await fetch('/api/matchHistory/' + summonerID,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
-        const matchHistory_data = await matchHistory_response.json();
-        console.log("api called");
-        return matchHistory_data;
+        if(summonerID){
+            const matchHistory_response = await fetch('/api/matchHistory/' + summonerID,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
+            const matchHistory_data = await matchHistory_response.json();
+            console.log("api called");
+            return matchHistory_data;
+        }
+        else
+            throw new Error("Null String");
     },
 
     async getTeamRankedInfoByID(players)
@@ -66,7 +68,7 @@ export default {
             let playerId = account_data.id;
 
             const ranked_response = await fetch('/api/ranked/'+ playerId,{ method: 'GET', headers: {'Content-Type' : 'text/plain' }});
-            const ranked_data = await  ranked_response.json();
+            const ranked_data = await ranked_response.json();
             return ranked_data;
         });
 
